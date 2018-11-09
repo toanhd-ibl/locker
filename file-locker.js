@@ -17,6 +17,12 @@ FileLocker.stats = (path) =>{
     })
 }
 
+FileLocker.getBirthtimeMs = async (path) =>{
+    let stats = await FileLocker.stats(path)
+    let birthtimeMs = stats.birthtimeMs;
+    return birthtimeMs;
+}
+
 // lock file by path, if file does not exist, create and return true
 // if file exists, return false
 FileLocker.lock = async function(path) {
@@ -50,8 +56,7 @@ FileLocker.lockTime = async function(path, miliseconds){
         if (e.code != 'EEXIST'){
             return false;
         }
-        let stats = await FileLocker.stats(path)
-        let birthtimeMs = stats.birthtimeMs;
+        let birthtimeMs = await FileLocker.getBirthtimeMs(path)
         let timeStamp = new Date().getTime();
         if (timeStamp - miliseconds > birthtimeMs){
             await FileLocker.unLock(path);
